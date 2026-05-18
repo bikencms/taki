@@ -43,8 +43,8 @@ class HomepageController extends Controller
         if( Cache::has('home_page')) {
             $homepage = Cache::get('home_page');
             $sliderRandoms = $this->tvshowService->getTvShowRandom();
-            $homepage['otts']['ottTitle'] = $sliderRandoms['title'];
-            $homepage['otts']['ottSliders'] = $sliderRandoms['items'];
+            $homepage['otts']['ottTitle'] = isset($sliderRandoms['title']) ? $sliderRandoms['title'] : "";
+            $homepage['otts']['ottSliders'] = isset($sliderRandoms['items']) ? $sliderRandoms['items'] : [];
         } else {
             //Get header slider
             $sliderQuery = "SELECT meta_key, ID, post_title, post_name, post_type, post_date, meta_value, IF(pm.meta_value IS NOT NULL , CAST( pm.meta_value AS UNSIGNED ) , 0 ) as sort_order
@@ -142,14 +142,15 @@ class HomepageController extends Controller
             foreach ($topWeeks as &$item) {
                 $item = \get_object_vars($item);
                 $item['genres'] = $genres[(int) $item['id']] ?? [];
-                $item += $moviesMetadataTopWeek[(int) $item['id']];
+
+                $item += isset($moviesMetadataTopWeek[(int) $item['id']]) ? $moviesMetadataTopWeek[(int) $item['id']] : [];
             }
 
             $homepage = [
                 'sliders' => $sliders,
                 'otts' => [
-                    'ottTitle' => $sliderRandoms['title'],
-                    'ottSliders' => $sliderRandoms['items']
+                    'ottTitle' => isset($sliderRandoms['title']) ? $sliderRandoms['title'] : "",
+                    'ottSliders' => isset($sliderRandoms['items']) ? $sliderRandoms['items'] : []
                 ],
                 'tvshows' => [
                     'title' => '최신등록 방송',
